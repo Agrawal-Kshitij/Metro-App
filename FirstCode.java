@@ -164,15 +164,42 @@ public class FirstCode {
 			System.out.println("\n***********************************************************************\n");
 		}
        
+        public void displayMap() 
+		{
+			System.out.println("\t Delhi Metro Map");
+			System.out.println("\t------------------");
+			System.out.println("----------------------------------------------------\n");
+			ArrayList<String> keys = new ArrayList<>(MetroMap.keySet());
+            Collections.sort(keys);
+
+			for (String key : keys) 
+			{
+				
+                StringBuilder str = new StringBuilder();
+                str.append(key).append(" =>\n");
+                Vertex vtx = MetroMap.get(key);
+                ArrayList<String> vtxnbrs = new ArrayList<>(vtx.nbrs.keySet());
+                Collections.sort(vtxnbrs);
         
+                for (String nbr : vtxnbrs) {
+                    int distance = vtx.nbrs.get(nbr);
+                    str.append(String.format("\t%-30s %d km\n", nbr, distance));
+                }
+        
+                System.out.println(str.toString());
+			}
+			System.out.println("\t------------------");
+			System.out.println("---------------------------------------------------\n");
+
+		}
     }
 
    public static void main(String[] var0) {
       System.out.println("Hii");
       MetroGraph g = new MetroGraph();
       g.createMetroMap(g);
-      g.displayStations();
-      
+      //g.displayStations();
+      g.displayMap();
 
 
    }
