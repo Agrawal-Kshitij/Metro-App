@@ -1,21 +1,25 @@
 // Source code is decompiled from a .class file using FernFlower decompiler.
 
 import java.util.*;
-
+import java.io.*;
 public class FirstCode {
     public static class MetroGraph{
         public static class Vertex{
             HashMap<String , Integer> nbrs = new HashMap<>();
         }
+
         HashMap<String, Vertex> MetroMap;
+
         public MetroGraph(){
             MetroMap = new HashMap<>();
         }
+
         public void addVertex(String vname) 
 		{
 			Vertex vtx = new Vertex();
 			MetroMap.put(vname, vtx);
 		}
+        
         public void addEdge(String vname1, String vname2, int value) 
 		{
 			Vertex vtx1 = MetroMap.get(vname1); 
@@ -182,8 +186,10 @@ public class FirstCode {
                 Collections.sort(vtxnbrs);
         
                 for (String nbr : vtxnbrs) {
-                    int distance = vtx.nbrs.get(nbr);
-                    str.append(String.format("\t%-30s %d km\n", nbr, distance));
+                    Integer distance = vtx.nbrs.get(nbr);
+                    if (distance != null) {
+                        str.append(String.format("\t%-30s %d km\n", nbr, distance));
+                    }
                 }
         
                 System.out.println(str.toString());
@@ -195,12 +201,61 @@ public class FirstCode {
     }
 
    public static void main(String[] var0) {
-      System.out.println("Hii");
       MetroGraph g = new MetroGraph();
       g.createMetroMap(g);
-      //g.displayStations();
-      g.displayMap();
+      System.out.println("\n\t\t\t****WELCOME TO THE DELHI METRO APP*****");
+      BufferedReader inp = new BufferedReader(new InputStreamReader(System.in));
+      while(true){
+                System.out.println("\t\t\t\t~~LIST OF ACTIONS~~\n\n");
+				System.out.println("1. LIST ALL THE METRO STATIONS IN THE MAP");
+				System.out.println("2. SHOW THE DELHI METRO MAP");
+				System.out.println("3. GET SHORTEST DISTANCE FROM A 'SOURCE' STATION TO 'DESTINATION' STATION");
+				System.out.println("4. GET SHORTEST TIME TO REACH FROM A 'SOURCE' STATION TO 'DESTINATION' STATION");
+				System.out.println("5. GET SHORTEST PATH (DISTANCE WISE) TO REACH FROM A 'SOURCE' STATION TO 'DESTINATION' STATION");
+				System.out.println("6. GET SHORTEST PATH (TIME WISE) TO REACH FROM A 'SOURCE' STATION TO 'DESTINATION' STATION");
+				System.out.println("7. EXIT THE MENU");
+				System.out.print("\nENTER YOUR CHOICE FROM THE ABOVE LIST (1 to 7) : ");
+                int choice = -1;
+                try{
+                    choice = Integer.parseInt(inp.readLine());
+                }
+                catch(Exception e){
+                    System.out.println("⚠️ Invalid input! Please enter a number between 1 and 7.");
+                    continue; // skip this iteration of the loop and ask again
+                    
+                }
+                if (choice < 1 || choice > 7) {
+                    System.out.println("❌ Please enter a number between 1 and 7.");
+                    continue; // again, back to menu
+                }
+                System.out.println("\n***********************************************************\n");
+				switch (choice) {
+                    case 1:
+                        g.displayStations();
+                        break;
+                    case 2:
+                        g.displayMap();
+                        break;
+                    case 3:
+                        System.out.println("🚧 Feature: Shortest Distance - Not yet implemented.");
+                        break;
+                    case 4:
+                        System.out.println("🚧 Feature: Shortest Time - Not yet implemented.");
+                        break;
+                    case 5:
+                        System.out.println("🚧 Feature: Shortest Distance Path - Not yet implemented.");
+                        break;
+                    case 6:
+                        System.out.println("🚧 Feature: Shortest Time Path - Not yet implemented.");
+                        break;
+                    case 7:
+                        System.out.println("✅ Exiting the Delhi Metro App. Thank you for using it!");
+                        return;
+                }
 
+                
+
+      }
 
    }
 }
