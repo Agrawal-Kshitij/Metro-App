@@ -19,7 +19,7 @@ public class FirstCode {
 			Vertex vtx = new Vertex();
 			MetroMap.put(vname, vtx);
 		}
-        
+
         public void addEdge(String vname1, String vname2, int value) 
 		{
 			Vertex vtx1 = MetroMap.get(vname1); 
@@ -198,6 +198,57 @@ public class FirstCode {
 			System.out.println("---------------------------------------------------\n");
 
 		}
+        public String[] printCodelist() {
+            System.out.println("List of all the stations along with their codes:\n");
+            ArrayList<String> keys = new ArrayList<>(MetroMap.keySet());
+            Collections.sort(keys);
+
+            String[] codes = new String[keys.size()];
+            Set<String> usedCodes = new HashSet<>();
+
+            int i = 1, m = 1;
+            for (int idx = 0; idx < keys.size(); idx++) {
+                String key = keys.get(idx);
+                String cleanName = key.split("~")[0]; // remove ~X suffix
+                String[] words = cleanName.split("\\s+");
+                StringBuilder code = new StringBuilder();
+
+                // Generate initial code from initials of each word
+                for (String word : words) {
+                    if (!word.isEmpty() && Character.isLetterOrDigit(word.charAt(0))) {
+                        code.append(Character.toUpperCase(word.charAt(0)));
+                    }
+                }
+
+                // If code is too short, pad with second letter or number
+                if (code.length() < 2 && cleanName.length() >= 2) {
+                    code.append(Character.toUpperCase(cleanName.charAt(1)));
+                }
+
+                String originalCode = code.toString();
+                int duplicateCount = 1;
+                while (usedCodes.contains(code.toString())) {
+                    code = new StringBuilder(originalCode + duplicateCount);
+                    duplicateCount++;
+                }
+
+                usedCodes.add(code.toString());
+                codes[idx] = code.toString();
+
+                // Output formatting
+                System.out.print(i + ". " + key + "\t");
+                if (key.length() < (22 - m)) System.out.print("\t");
+                if (key.length() < (14 - m)) System.out.print("\t");
+                if (key.length() < (6 - m)) System.out.print("\t");
+                System.out.println(codes[idx]);
+
+                i++;
+                if (i == (int) Math.pow(10, m)) m++;
+            }
+
+            return codes;
+}
+
     }
 
    public static void main(String[] var0) {
@@ -205,6 +256,8 @@ public class FirstCode {
       g.createMetroMap(g);
       System.out.println("\n\t\t\t****WELCOME TO THE DELHI METRO APP*****");
       BufferedReader inp = new BufferedReader(new InputStreamReader(System.in));
+      ArrayList<String> keys = new ArrayList<>(g.MetroMap.keySet());
+      Collections.sort(keys); // Ensure order matches with codes[]  
       while(true){
                 System.out.println("\t\t\t\t~~LIST OF ACTIONS~~\n\n");
 				System.out.println("1. LIST ALL THE METRO STATIONS IN THE MAP");
@@ -237,7 +290,144 @@ public class FirstCode {
                         g.displayMap();
                         break;
                     case 3:
-                        System.out.println("🚧 Feature: Shortest Distance - Not yet implemented.");
+                        
+                        String [] codes = g.printCodelist();
+                        System.out.println("\n1. TO ENTER SERIAL NO. OF STATIONS");
+                        System.out.println("2. TO ENTER CODE OF STATIONS");
+                        System.out.println("3. TO ENTER NAME OF STATIONS");
+                        System.out.print("ENTER YOUR CHOICE: ");
+                        int localChoice = -1;
+                        try{
+                            localChoice = Integer.parseInt(inp.readLine().trim());
+                        }
+                        catch(Exception e){
+                            System.out.println("⚠️ INVALID INPUT ! Please enter a number from 1 to 3.");
+                            break; // Exit the case block
+                        }
+                        String start = "";
+                        String end = "";
+                        System.out.println("ENTER THE SOURCE AND DESTINATION METRO STATIONS");
+                        switch (localChoice) {
+                            case 1:
+                            int sourceIdx = -1;
+                            int destIdx = -1;
+                            try{
+                                System.out.print("Enter SOURCE serial number: ");
+                                sourceIdx = Integer.parseInt(inp.readLine().trim());
+                                System.out.print("Enter DESTINATION serial number: ");
+                                destIdx = Integer.parseInt(inp.readLine().trim());
+                            }
+                            catch(Exception e){
+                                System.out.println("⚠️ Invalid input! Please enter a number from 1 to 3.");
+                                break; // Exit the case block
+                            }
+                            
+                                // Adjusting for 0-based index
+                            if (sourceIdx < 1 || sourceIdx > codes.length || destIdx < 1 || destIdx > codes.length) {
+                                System.out.println("❌ Invalid serial numbers entered.");
+                                break;
+                            }
+                            if(sourceIdx == destIdx){
+                                System.out.println("Source and Destination Stations can't be same ");
+                                break;
+                            }
+                             // Get the corresponding station names from keys
+                            
+                            start = keys.get(sourceIdx - 1);
+                            end = keys.get(destIdx - 1);
+                            System.out.println("✅ Source: " + start);
+                            System.out.println("✅ Destination: " + end);
+                            break;
+                                
+                            case 2:
+                                System.out.println("👉 You selected: Enter by CODE.");
+                                try {
+                                    System.out.print("Enter SOURCE station code: ");
+                                    String sourceCode = inp.readLine().trim().toUpperCase();
+
+                                    System.out.print("Enter DESTINATION station code: ");
+                                    String destCode = inp.readLine().trim().toUpperCase();
+                                    if (sourceCode.isEmpty() || destCode.isEmpty()) {
+                                        System.out.println("⚠️ Station codes cannot be empty.");
+                                        break;
+                                    }
+                                    
+
+                                    int sourceIdx2 = -1, destIdx2 = -1;
+                                    for (int i = 0; i < codes.length; i++) {
+                                        if (codes[i].equals(sourceCode)) sourceIdx2 = i;
+                                        if (codes[i].equals(destCode)) destIdx2 = i;
+                                    }
+
+                                    if (sourceIdx2 == -1 || destIdx2 == -1) {
+                                        System.out.println("❌ One or both station codes are invalid.");
+                                        break;
+                                    }
+
+                                    start = keys.get(sourceIdx2);
+                                    end = keys.get(destIdx2);
+                                    if(start.equals(end)){
+                                        System.out.println("⚠️ Source and destination stations cannot be the same.");
+                                        break;
+                                    }
+
+                                    
+                                    System.out.println("✅ Source: " + start);
+                                    System.out.println("✅ Destination: " + end);
+                                    break;
+
+                                    } catch (Exception e) {
+                                        System.out.println("⚠️ Invalid input! Please enter valid codes like 'RC', 'ND', etc.");
+                                        break;
+                                    }
+                            case 3:
+                                System.out.println("👉 You selected: Enter by NAME.");
+                                try {
+                                    System.out.print("Enter SOURCE station name: ");
+                                    String sourceName = inp.readLine().trim();
+
+                                    System.out.print("Enter DESTINATION station name: ");
+                                    String destName = inp.readLine().trim();
+
+                                    if (sourceName.equalsIgnoreCase(destName)) {
+                                        System.out.println("⚠️ Source and destination stations cannot be the same.");
+                                        break;
+                                    }
+
+                                    String sourceFullKey = null, destFullKey = null;
+
+                                    for (String key : keys) {
+                                        if (key.split("~")[0].equalsIgnoreCase(sourceName)) {
+                                            sourceFullKey = key;
+                                        }
+                                        if (key.split("~")[0].equalsIgnoreCase(destName)) {
+                                            destFullKey = key;
+                                        }
+                                    }
+
+                                    if (sourceFullKey == null || destFullKey == null) {
+                                        System.out.println("❌ One or both station names are invalid.");
+                                        break;
+                                    }
+
+                                    start = sourceFullKey;
+                                    end = destFullKey;
+
+                                    System.out.println("✅ Source: " + start);
+                                    System.out.println("✅ Destination: " + end);
+
+                                } catch (Exception e) {
+                                    System.out.println("⚠️ Invalid input! Please enter proper station names like 'Rajiv Chowk'.");
+                                }
+                                break;
+
+                            default:
+                                System.out.println("❌ Invalid choice. Please enter 1, 2 or 3.");
+                                break;
+                        }
+                        
+				        
+
                         break;
                     case 4:
                         System.out.println("🚧 Feature: Shortest Time - Not yet implemented.");
