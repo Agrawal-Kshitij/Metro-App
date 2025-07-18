@@ -20,6 +20,80 @@ public class FirstCode {
 			MetroMap.put(vname, vtx);
 		}
 
+
+        public void dijkstra(String start, String end) {
+            PriorityQueue<Pair> pq = new PriorityQueue<>();
+            HashMap<String, Integer> distances = new HashMap<>();
+            HashMap<String, String> parents = new HashMap<>();
+            HashSet<String> visited = new HashSet<>();
+
+            // Initialize distances to Infinity
+            for (String station : MetroMap.keySet()) {
+                distances.put(station, Integer.MAX_VALUE);
+            }
+
+            // Start station has distance 0
+            distances.put(start, 0);
+            pq.add(new Pair(start, 0, null));
+
+            while (!pq.isEmpty()) {
+                Pair current = pq.poll();
+
+                if (visited.contains(current.name)) continue;
+                visited.add(current.name);
+
+                parents.put(current.name, current.parent);
+
+                Vertex v = MetroMap.get(current.name);
+                for (String nbr : v.nbrs.keySet()) {
+                    if (!visited.contains(nbr)) {
+                        int newDist = distances.get(current.name) + v.nbrs.get(nbr);
+                        if (newDist < distances.get(nbr)) {
+                            distances.put(nbr, newDist);
+                            pq.add(new Pair(nbr, newDist, current.name));
+                        }
+                    }
+                }
+            }
+
+            if (!distances.containsKey(end) || distances.get(end) == Integer.MAX_VALUE) {
+                System.out.println("No path exists from " + start + " to " + end);
+                return;
+            }
+
+            // Reconstruct path from end to start
+            LinkedList<String> path = new LinkedList<>();
+            String current = end;
+            while (current != null) {
+                path.addFirst(current);
+                current = parents.get(current);
+            }
+
+            // Output path and distance
+            System.out.println("Shortest Path (Distance-wise):");
+            for (int i = 0; i < path.size(); i++) {
+                System.out.print(path.get(i));
+                if (i != path.size() - 1) System.out.print(" -> ");
+            }
+            System.out.println("\nTotal Distance = " + distances.get(end) + " km\n");
+        }
+
+        class Pair implements Comparable<Pair> {
+            String name;
+            int cost;
+            String parent;
+
+            public Pair(String name, int cost, String parent) {
+                this.name = name;
+                this.cost = cost;
+                this.parent = parent;
+            }
+
+            @Override
+            public int compareTo(Pair other) {
+                return this.cost - other.cost;
+            }
+        }
         public void addEdge(String vname1, String vname2, int value) 
 		{
 			Vertex vtx1 = MetroMap.get(vname1); 
@@ -248,8 +322,9 @@ public class FirstCode {
 
             return codes;
 }
-
+        
     }
+    
 
    public static void main(String[] var0) {
       MetroGraph g = new MetroGraph();
@@ -262,9 +337,8 @@ public class FirstCode {
                 System.out.println("\t\t\t\t~~LIST OF ACTIONS~~\n\n");
 				System.out.println("1. LIST ALL THE METRO STATIONS IN THE MAP");
 				System.out.println("2. SHOW THE DELHI METRO MAP");
-				System.out.println("3. GET SHORTEST DISTANCE FROM A 'SOURCE' STATION TO 'DESTINATION' STATION");
+				System.out.println("3. GET SHORTEST DISTANCE CORRESPONDING PATH FROM A 'SOURCE' STATION TO 'DESTINATION' STATION");
 				System.out.println("4. GET SHORTEST TIME TO REACH FROM A 'SOURCE' STATION TO 'DESTINATION' STATION");
-				System.out.println("5. GET SHORTEST PATH (DISTANCE WISE) TO REACH FROM A 'SOURCE' STATION TO 'DESTINATION' STATION");
 				System.out.println("6. GET SHORTEST PATH (TIME WISE) TO REACH FROM A 'SOURCE' STATION TO 'DESTINATION' STATION");
 				System.out.println("7. EXIT THE MENU");
 				System.out.print("\nENTER YOUR CHOICE FROM THE ABOVE LIST (1 to 7) : ");
@@ -425,6 +499,8 @@ public class FirstCode {
                                 System.out.println("❌ Invalid choice. Please enter 1, 2 or 3.");
                                 break;
                         }
+                        System.out.println("\n🚇 SHORTEST PATH (Distance-wise) from " + start + " to " + end + ":");
+                        g.dijkstra(start, end);
                         
 				        
 
